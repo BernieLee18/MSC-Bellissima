@@ -1,0 +1,6 @@
+{
+  "name": "MSC Cruise Companion",
+  "description": "A luxury concierge companion app for the MSC Bellissima Mediterranean cruise (Sasebo & Kagoshima).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

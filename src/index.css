@@ -1,0 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Poppins", "Inter", "Noto Sans TC", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Fira Code", "SFMono-Regular", Menlo, Monaco, Consolas, monospace;
+}
+
+/* Base resets & iOS Rubber-banding mitigation defaults */
+html, body {
+  background-color: #f0f4fb;
+  color: #1e293b;
+  font-family: var(--font-sans);
+  overscroll-behavior-y: none; /* Block iOS rubber elastic pull over outer body segments */
+}
+
+/* Custom transitions used for native view triggers */
+.animate-slide-up {
+  animation: slideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.35s ease-out forwards;
+}
+
+.animate-pulse-slow {
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-bounce-slow {
+  animation: bounce 2s infinite;
+}
+
+.animate-spin-slow {
+  animation: spin 12s linear infinite;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* High precision golden highlight flash on map detail redirections */
+@keyframes goldPulseFlash {
+  0% {
+    box-shadow: 0 0 0 0px rgba(212, 175, 55, 0.9), inset 0 0 0 0px rgba(212, 175, 55, 0.3);
+    border-color: rgba(212, 175, 55, 0.9);
+    transform: scale(1);
+  }
+  25% {
+    box-shadow: 0 0 35px 12px rgba(212, 175, 55, 0.7), inset 0 0 25px 8px rgba(212, 175, 55, 0.4);
+    border-color: #fffa65;
+    transform: scale(1.03);
+  }
+  50% {
+    box-shadow: 0 0 20px 8px rgba(212, 175, 55, 0.5), inset 0 0 15px 5px rgba(212, 175, 55, 0.2);
+    border-color: #d4af37;
+    transform: scale(1.01);
+  }
+  100% {
+    box-shadow: 0 0 0px 0px rgba(212, 175, 55, 0), inset 0 0 0px 0px rgba(212, 175, 55, 0);
+    border-color: rgba(255, 255, 255, 0.05);
+    transform: scale(1);
+  }
+}
+
+.highlight-flash {
+  animation: goldPulseFlash 2.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* Custom scrollbars inside small panels to maintain layout clean proportions */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.25);
+  border-radius: 9px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.5);
+}
+
+/* Hide standard screen wide vertical scrollbars on root layout */
+::-webkit-scrollbar {
+  display: none;
+}
+* {
+  scrollbar-width: none; /* Firefox support to hide scrollers */
+}
