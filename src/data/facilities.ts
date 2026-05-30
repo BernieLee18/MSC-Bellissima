@@ -596,7 +596,7 @@ export const facilitiesData: Facility[] = [
     category: "旅客服務",
     name: "Doremiland 哆來咪樂園 - 兒童俱樂部",
     englishName: "Doremiland Kids Club",
-    timeLine: "寶寶託用: 11:00-13:00 / 15:00-17:00 / 19:00-22:00（3歲以下需家長陪同）；親子開放: 10:00-22:00",
+    timeLine: "寶寶託用: 11:00-13:00 / 15:00-17:00 / 19:00-22:00（3歲以下需陪同）；親子開放: 10:00-22:00",
     description: "跨領域多功能兒童奇幻世界。嬰幼兒俱樂部提供與全球母嬰領導品牌義大利 Chicco® 攜手研發的益智玩具與遊戲；內部分為 3-11 歲樂高積木區（Lego Group 限定合作研發）、青少年電競休息區等，提供最安全的專業海上兒童托育服務。",
     cx: 180,
     cy: 710
@@ -661,7 +661,7 @@ export const facilitiesData: Facility[] = [
     name: "MSC Yacht Club Pool 專屬尊貴景觀游泳池 & Whirlpool 漩渦池",
     englishName: "Yacht Club The One Pool (Private Deck)",
     timeLine: "08:00 - 20:00",
-    description: "遊艇會專屬 19 樓頂端景觀游泳池（水深 1.4m - 1.5m）與兩個奢華熱水漩渦按摩池（Whirlpools），配有極奢華柚木地板、金色日光浴沙發、超大蓬鬆藍白寬條浴巾與管家級溫馨池畔小點服務。注意：sundeck 右下角有玻璃屏風阻擋處，是遊艇會專屬戶外煙區，帶小孩的家長可避開右下角活動。",
+    description: "遊艇會專屬 19 樓頂端景觀游泳池（水深 1.4m - 1.5m）與兩個奢華熱水漩渦按摩池（Whirlpools），配有極奢華柚木地板、金色日光浴沙發、超大蓬鬆藍白寬條浴巾與管家級溫馨池畔小點服務。注意：sundeck 右下角有玻璃屏風阻擋處，是遊艇會專屬戶外煙區，攜童旅客可避開右下角活動。",
     privilege: "地中海遊艇會貴賓專屬（需刷卡/手環通行門禁）。",
     cx: 200,
     cy: 190

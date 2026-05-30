@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { 
   X, ZoomIn, ZoomOut, RotateCcw, HelpCircle, AlertTriangle, 
-  MapPin, Utensils, Wine, ShieldCheck, Heart, Sparkles, Smile, Info
+  MapPin, Utensils, Wine, ShieldCheck, Heart, Sparkles, Smile, Info, Compass
 } from "lucide-react";
 import { Facility } from "../types";
 import { facilitiesData, whirlpoolsData, smokingAreasData } from "../data/facilities";
@@ -16,6 +16,7 @@ interface DeckPlanModalProps {
   onClose: () => void;
   onSelectFacilityDetail: (facilityId: string) => void;
   initialDeck?: number;
+  initialFacility?: Facility | null;
 }
 
 const CATEGORY_COLORS = {
@@ -30,7 +31,8 @@ export default function DeckPlanModal({
   isOpen, 
   onClose, 
   onSelectFacilityDetail, 
-  initialDeck = 15 
+  initialDeck = 15,
+  initialFacility
 }: DeckPlanModalProps) {
   const [selectedDeck, setSelectedDeck] = useState<number>(initialDeck);
   const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
@@ -52,8 +54,13 @@ export default function DeckPlanModal({
   // Set initial deck and handle first-time onboarding via localStorage
   useEffect(() => {
     if (isOpen) {
-      setSelectedDeck(initialDeck);
-      setSelectedFacility(null);
+      if (initialFacility) {
+        setSelectedDeck(initialFacility.deck);
+        setSelectedFacility(initialFacility);
+      } else {
+        setSelectedDeck(initialDeck);
+        setSelectedFacility(null);
+      }
       // Disable background vertical scrolling on iOS/mobile
       document.body.style.overflow = "hidden";
       document.body.style.touchAction = "none";
@@ -71,7 +78,7 @@ export default function DeckPlanModal({
       document.body.style.overflow = "";
       document.body.style.touchAction = "";
     };
-  }, [isOpen, initialDeck]);
+  }, [isOpen, initialDeck, initialFacility]);
 
   // Onboarding timer: auto fadeout after 5 seconds
   useEffect(() => {
@@ -121,7 +128,9 @@ export default function DeckPlanModal({
     setIsDragging(false);
   };
 
-  // Touch handlers for mobile pan
+  // Touch handlers for mobile pan & pinch zoom
+  const touchStartRef = useRef<{ dist: number; scale: number } | null>(null);
+
   const handleTouchStart = (e: React.TouchEvent) => {
     // Dismiss onboarding immediately on any touch
     if (showOnboarding) {
@@ -131,16 +140,31 @@ export default function DeckPlanModal({
       setIsDragging(true);
       const touch = e.touches[0];
       dragStart.current = { x: touch.clientX - pan.x, y: touch.clientY - pan.y };
+      touchStartRef.current = null;
+    } else if (e.touches.length === 2) {
+      setIsDragging(false); // Disable dragging while pinching
+      const t1 = e.touches[0];
+      const t2 = e.touches[1];
+      const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+      touchStartRef.current = { dist, scale };
     }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging || e.touches.length !== 1) return;
-    const touch = e.touches[0];
-    setPan({
-      x: touch.clientX - dragStart.current.x,
-      y: touch.clientY - dragStart.current.y
-    });
+    if (e.touches.length === 1 && isDragging) {
+      const touch = e.touches[0];
+      setPan({
+        x: touch.clientX - dragStart.current.x,
+        y: touch.clientY - dragStart.current.y
+      });
+    } else if (e.touches.length === 2 && touchStartRef.current) {
+      const t1 = e.touches[0];
+      const t2 = e.touches[1];
+      const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+      const factor = dist / touchStartRef.current.dist;
+      const nextScale = Math.min(Math.max(touchStartRef.current.scale * factor, 0.75), 4);
+      setScale(nextScale);
+    }
   };
 
   // Handle detailed routing trigger in App
@@ -160,7 +184,7 @@ export default function DeckPlanModal({
       <header className="pt-2 px-4 pb-3 border-b border-white/5 bg-[#0b111e]/95 flex justify-between items-center z-10 select-none">
         <div className="flex items-center gap-3">
           <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-500">
-            <CompassIcon className="w-5 h-5 animate-spin-slow" />
+            <Compass className="w-5 h-5 animate-spin-slow" />
           </div>
           <div>
             <h2 className="text-sm font-semibold tracking-wide text-white uppercase flex items-center gap-2">
@@ -179,39 +203,54 @@ export default function DeckPlanModal({
 
       {/* CORE CONTAINER: MAP VIEWPORT + FLOOR SELECTOR */}
       <div className="relative flex-1 bg-[#050b14] overflow-hidden flex">
-        {/* Dynamic Filters Sidebar on the LEFT side */}
-        <div className="absolute top-4 left-3 z-30 flex flex-col gap-2">
+        {/* Dynamic Filters & Color Category Legend Sidebar on the LEFT side */}
+        <div className="absolute top-4 left-3 z-30 flex flex-col gap-2 max-w-[125px] sm:max-w-[145px]">
           {/* Smoking Warning Filter (Toggle highlight) */}
           <button
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               if (navigator.vibrate) navigator.vibrate(15);
               setShowSmoking(!showSmoking);
             }}
-            className={`px-3 py-2 rounded-xl flex items-center gap-1.5 border backdrop-blur-md transition-all text-[11px] font-medium shadow-md ${
+            className={`px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 border backdrop-blur-md transition-all text-[10px] font-bold shadow-md ${
               showSmoking 
-                ? "bg-amber-600/20 border-amber-500/50 text-amber-400" 
-                : "bg-black/30 border-white/5 text-gray-400"
+                ? "bg-amber-600/20 border-amber-500/50 text-amber-405" 
+                : "bg-black/40 border-white/5 text-gray-400"
             }`}
           >
-            <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
-            <span>避開吸煙區</span>
+            <AlertTriangle className="w-3 h-3 flex-shrink-0" />
+            <span>避開吸菸區</span>
           </button>
 
           {/* Whirlpool Filter */}
           <button
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               if (navigator.vibrate) navigator.vibrate(15);
               setShowWhirlpools(!showWhirlpools);
             }}
-            className={`px-3 py-2 rounded-xl flex items-center gap-1.5 border backdrop-blur-md transition-all text-[11px] font-medium shadow-md ${
+            className={`px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 border backdrop-blur-md transition-all text-[10px] font-bold shadow-md ${
               showWhirlpools 
                 ? "bg-emerald-600/20 border-emerald-500/50 text-emerald-400" 
-                : "bg-black/30 border-white/5 text-gray-400"
+                : "bg-black/40 border-white/5 text-gray-400"
             }`}
           >
-            <Heart className="w-3.5 h-3.5 flex-shrink-0" />
-            <span>按摩池 Whirlpool</span>
+            <Heart className="w-3 h-3 flex-shrink-0" />
+            <span>按摩池</span>
           </button>
+
+          {/* Color Categories Legend Section */}
+          <div className="bg-black/60 backdrop-blur-lg border border-white/10 p-2.5 rounded-2xl flex flex-col gap-1.5 shadow-2xl select-none mt-1">
+            <span className="text-[8.5px] font-bold text-amber-400/90 tracking-widest uppercase border-b border-white/5 pb-1 mb-0.5">分類圖例</span>
+            {Object.entries(CATEGORY_COLORS).map(([key, value]) => (
+              <div key={key} className="flex items-center gap-1.5 leading-none">
+                <span className={`w-2 h-2 rounded-full shrink-0 ${value.bg}`} />
+                <span className="text-[9px] text-gray-300 font-extrabold leading-none truncate">
+                  {key === "購物與休閒娛樂" ? "休閒娛樂" : key === "水上與戶外娛樂" ? "水上戶外" : key}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Floor Selection side rail on the RIGHT side (Tactile physical layout) */}
@@ -220,7 +259,8 @@ export default function DeckPlanModal({
           {[19, 18, 16, 15, 7, 6, 5].map((deckNo) => (
             <button
               key={deckNo}
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 if (navigator.vibrate) navigator.vibrate(15);
                 setSelectedDeck(deckNo);
                 setSelectedFacility(null);
@@ -239,6 +279,7 @@ export default function DeckPlanModal({
         {/* MAP CANVAS VIEWPORT */}
         <div 
           ref={mapContainerRef}
+          onClick={() => setSelectedFacility(null)}
           className="flex-1 w-full h-full relative cursor-grab select-none overflow-hidden"
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
@@ -279,10 +320,32 @@ export default function DeckPlanModal({
                 <line x1="65" y1="360" x2="335" y2="360" stroke="#fffa" strokeOpacity="0.08" strokeWidth="1" />
                 <line x1="85" y1="670" x2="315" y2="670" stroke="#fffa" strokeOpacity="0.08" strokeWidth="1" />
                 
-                {/* FWD/MID/AFT label texts */}
-                <text x="200" y="110" textAnchor="middle" fill="#d4af37" fillOpacity="0.3" fontSize="16" fontWeight="bold">FWD 船頭 (BOW)</text>
-                <text x="200" y="520" textAnchor="middle" fill="#d4af37" fillOpacity="0.3" fontSize="16" fontWeight="bold">MID 船中 (MIDDLE)</text>
-                <text x="200" y="870" textAnchor="middle" fill="#d4af37" fillOpacity="0.3" fontSize="16" fontWeight="bold">AFT 船尾 (STERN)</text>
+                {/* FWD/MID/AFT label texts in Chinese only */}
+                <text x="200" y="115" textAnchor="middle" fill="#d4af37" fillOpacity="0.35" fontSize="20" fontWeight="bold">船頭</text>
+                <text x="200" y="520" textAnchor="middle" fill="#d4af37" fillOpacity="0.35" fontSize="20" fontWeight="bold">船中</text>
+                <text x="200" y="870" textAnchor="middle" fill="#d4af37" fillOpacity="0.35" fontSize="20" fontWeight="bold">船尾</text>
+
+                {/* Stylized Swimming Pools on Deck 15 */}
+                {selectedDeck === 15 && (
+                  <g>
+                    {/* Atmosphere Pool (Main long pool in MID) */}
+                    <rect x="135" y="555" width="130" height="42" rx="14" fill="#0284c7" fillOpacity="0.3" stroke="#38bdf8" strokeWidth="1.5" />
+                    <text x="200" y="580" textAnchor="middle" fill="#e0f2fe" fontSize="10" fontWeight="black" fillOpacity="0.8">大氣氛游泳池 (Atmosphere Pole)</text>
+
+                    {/* Grand Canyon Pool (Indoor pool) */}
+                    <rect x="125" y="380" width="150" height="52" rx="10" fill="#0d9488" fillOpacity="0.3" stroke="#2dd4bf" strokeWidth="1.5" />
+                    <text x="200" y="411" textAnchor="middle" fill="#ccfbf1" fontSize="10" fontWeight="black" fillOpacity="0.8">大峽谷溫水游泳池</text>
+                  </g>
+                )}
+
+                {/* Stylized Swimming Pool on Yacht Club Decks 18/19 */}
+                {(selectedDeck === 19 || selectedDeck === 18) && (
+                  <g>
+                    {/* Yacht Club Pool */}
+                    <path d="M 148 180 Q 200 165 252 180 L 235 220 Q 200 230 165 220 Z" fill="#0284c7" fillOpacity="0.35" stroke="#38bdf8" strokeWidth="1.5" />
+                    <text x="200" y="202" textAnchor="middle" fill="#e0f2fe" fontSize="10" fontWeight="black" fillOpacity="0.8">遊艇會專屬游泳池</text>
+                  </g>
+                )}
               </svg>
 
               {/* DYNAMIC PINS INTERACTION PANELS */}
@@ -291,6 +354,8 @@ export default function DeckPlanModal({
                 {showWhirlpools && currentDeckWhirlpools.map((wp) => (
                   <button
                     key={wp.id}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onTouchStart={(e) => e.stopPropagation()}
                     onClick={(e) => {
                       e.stopPropagation();
                       if (navigator.vibrate) navigator.vibrate(30);
@@ -325,13 +390,15 @@ export default function DeckPlanModal({
                   const xPct = (smk.cx / 400) * 100;
                   const yPct = (smk.cy / 1000) * 100;
                   return (
-                    <div key={smk.id} className="pointer-events-none">
-                      {/* Bounding shadow alerts (orange/red solid boundaries) */}
-                      <div 
-                        style={{ left: `${xPct}%`, top: `${yPct}%` }}
-                        className="absolute -translate-x-1/2 -translate-y-1/2 w-[75px] h-[34px] bg-amber-600/10 border-2 border-dashed border-amber-500/50 rounded-xl flex items-center justify-center shadow-lg z-10"
-                      />
+                    <div 
+                      key={smk.id} 
+                      style={{ left: `${xPct}%`, top: `${yPct}%` }}
+                      className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10"
+                    >
+                      {/* Double-layered dashed red boundary box as requested (no raw smoking icon fumes) */}
                       <button
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onTouchStart={(e) => e.stopPropagation()}
                         onClick={(e) => {
                           e.stopPropagation();
                           if (navigator.vibrate) navigator.vibrate(30);
@@ -343,18 +410,16 @@ export default function DeckPlanModal({
                             name: smk.name,
                             englishName: `Warning: Smoking Area (${smk.type})`,
                             timeLine: "24 小時避開管制區",
-                            description: `${smk.description} ❗ 帶著長輩小孩與 2 歲嬰童者，行進該路段請提早就座於左側，避免受二手菸污染。`,
+                            description: `${smk.description} ❗ 敏感或攜童之旅客，行經該路段可提早就座於左側（上風處），以避免受二手菸干擾。`,
                             cx: smk.cx,
                             cy: smk.cy
                           };
                           setSelectedFacility(compositeFac);
                         }}
-                        style={{ left: `${xPct}%`, top: `${yPct}%` }}
-                        className="absolute -translate-x-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center z-20 pointer-events-auto cursor-pointer"
+                        className="w-[85px] h-[32px] bg-red-600/10 hover:bg-red-600/15 border-1.5 border-dashed border-red-500 rounded-lg flex flex-col justify-center items-center cursor-pointer transition-all active:scale-95 shadow-md p-1"
                       >
-                        <div className="w-6 h-6 rounded-lg bg-orange-600 text-white flex items-center justify-center shadow-lg font-bold text-xs">
-                          🚬
-                        </div>
+                        <span className="text-[8px] text-red-400 font-extrabold tracking-tight leading-none">吸菸管制區</span>
+                        <span className="text-[7px] text-gray-300 font-bold tracking-tighter leading-none mt-1">避開提示 (點擊)</span>
                       </button>
                     </div>
                   );
@@ -375,6 +440,8 @@ export default function DeckPlanModal({
                     >
                       {/* Pulse circle with extra expanded tapping area */}
                       <button
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onTouchStart={(e) => e.stopPropagation()}
                         onClick={(e) => {
                           e.stopPropagation();
                           if (navigator.vibrate) navigator.vibrate(30);
@@ -388,23 +455,8 @@ export default function DeckPlanModal({
                         
                         {/* Core pin layout */}
                         <div className={`w-3.5 h-3.5 rounded-full ${isMainRest ? "bg-gray-600 border border-white/50" : catColor.bg} border-2 border-[#050b14] flex items-center justify-center transition-all group-hover:scale-125 shadow-lg`}>
-                          {/* Pulsing removed for clean non-flickering look */}
-                        </div>
-                        
-                        {/* Miniature categoric symbol above */}
-                        <div className="absolute -top-1 bg-black/60 backdrop-blur-md px-1 rounded border border-white/5 text-[7px] text-gray-300 font-mono scale-90 pointer-events-none select-none">
-                          {isMainRest ? "REST 📍" : f.category === "餐廳" ? "DINING" : f.category === "酒吧" ? "BAR" : f.category === "旅客服務" ? "SERV" : "REC"}
                         </div>
                       </button>
-
-                      {/* Side label tag (with click prevention) */}
-                      <div className="absolute top-7 w-[100px] text-center pointer-events-none select-none">
-                        <p className={`text-[8px] font-bold py-0.5 px-1 bg-[#050b14]/95 rounded border border-white/5 shadow-md leading-tight text-ellipsis truncate ${
-                          isMainRest ? "text-gray-500 line-through opacity-50" : "text-white"
-                        }`}>
-                          {f.name.split(" ")[0]}
-                        </p>
-                      </div>
                     </div>
                   );
                 })}

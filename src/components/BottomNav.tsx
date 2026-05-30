@@ -35,7 +35,7 @@ export default function BottomNav({ activeTab, setActiveTab, onOpenDeckPlan }: B
 
   return (
     <nav 
-      className="fixed bottom-0 left-0 right-0 z-50 bg-[#0d1629]/95 border-t border-[#233a5f] backdrop-blur-xl shadow-2xl transition-all"
+      className="fixed bottom-0 left-0 right-0 z-50 bg-[#f8f5ee]/95 border-t border-stone-200/90 backdrop-blur-xl shadow-lg transition-all"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <div className="max-w-xl md:max-w-2xl mx-auto h-[58px] px-8 flex justify-between items-center">
@@ -51,14 +51,13 @@ export default function BottomNav({ activeTab, setActiveTab, onOpenDeckPlan }: B
                   if (navigator.vibrate) navigator.vibrate(30);
                   onOpenDeckPlan();
                 }}
-                className="flex flex-col items-center justify-center -translate-y-2.5 relative group cursor-pointer"
+                className="flex flex-col items-center justify-center w-14 h-full active:scale-90 transition-all duration-200 cursor-pointer relative text-stone-500 hover:text-stone-855"
                 id={`nav-btn-${item.id}`}
               >
-                {/* Golden glowing circle background for Deck Plan map shortcut */}
-                <div className="w-13 h-13 rounded-full bg-gradient-to-tr from-amber-300 to-amber-500 shadow-lg shadow-amber-500/10 flex items-center justify-center text-slate-950 active:scale-95 group-hover:scale-105 transition-all">
-                  <Icon className="w-6 h-6 stroke-[2.5]" />
-                </div>
-                <span className="text-[10px] font-black text-amber-400 mt-1">地圖</span>
+                <Icon className="w-5 h-5 stroke-[1.8]" />
+                <span className="text-[10.5px] tracking-wider mt-1 font-semibold">
+                  {item.label}
+                </span>
               </button>
             );
           }
@@ -68,21 +67,16 @@ export default function BottomNav({ activeTab, setActiveTab, onOpenDeckPlan }: B
               key={item.id}
               onClick={() => triggerNavigation(item.id)}
               className={`flex flex-col items-center justify-center w-14 h-full active:scale-90 transition-all duration-200 cursor-pointer relative ${
-                isActive ? "text-amber-450 scale-105" : "text-slate-400 hover:text-white"
+                isActive ? "text-amber-850 scale-103" : "text-stone-500 hover:text-stone-850"
               }`}
               id={`nav-btn-${item.id}`}
             >
               <Icon className={`w-5 h-5 transition-transform ${isActive ? "stroke-[2.5]" : "stroke-[1.8]"}`} />
               <span className={`text-[10.5px] tracking-wider mt-1 transition-all ${
-                isActive ? "font-black text-amber-450" : "font-semibold"
+                isActive ? "font-black text-amber-850" : "font-semibold"
               }`}>
                 {item.label}
               </span>
-              
-              {/* Dynamic little golden anchor active dot underneath */}
-              {isActive && (
-                <span className="absolute bottom-1 w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-              )}
             </button>
           );
         })}

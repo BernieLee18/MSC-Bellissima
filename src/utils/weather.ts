@@ -110,9 +110,8 @@ export async function fetchWeather(lat: number, lng: number, name: string, dateS
     const temps: number[] = data.hourly.temperature_2m || [];
     const codes: number[] = data.hourly.weathercode || [];
 
-    // Find the first 6 indices with interval of 2 or 3 hours
-    for (let i = 8; i < 24; i += 3) {
-      if (times[i]) {
+    for (let i = 0; i < times.length; i++) {
+      if (times[i] && times[i].startsWith(dateStr)) {
         const d = new Date(times[i]);
         const hourStr = `${String(d.getHours()).padStart(2, "0")}:00`;
         const tempVal = Math.round(temps[i]);
@@ -131,9 +130,24 @@ export async function fetchWeather(lat: number, lng: number, name: string, dateS
       }
     }
 
-    // If hourly didn't fetch we fill with fallback
-    if (hourlyList.length === 0) {
-      hourlyList.push(...defaultWeatherData[name].hourly);
+    // If hourly didn't fetch or is incomplete, generate simulated 24 hours
+    if (hourlyList.length < 12) {
+      hourlyList.length = 0; // Clear partials
+      const baseTemp = curTemp;
+      for (let h = 0; h < 24; h++) {
+        const hourStr = `${String(h).padStart(2, "0")}:00`;
+        const tempDiff = -Math.abs(h - 14) * 0.4 + 3;
+        const finalTemp = Math.round(baseTemp + tempDiff);
+        let hCond = "晴";
+        if (cond.includes("雲")) hCond = "多雲";
+        else if (cond.includes("雨") && h >= 13 && h <= 17) hCond = "局部雨";
+        else if (h >= 19 || h <= 5) hCond = "晴朗";
+        hourlyList.push({
+          time: hourStr,
+          temp: `${finalTemp}°C`,
+          condition: hCond
+        });
+      }
     }
 
     return {
@@ -148,6 +162,26 @@ export async function fetchWeather(lat: number, lng: number, name: string, dateS
     };
   } catch (err) {
     console.warn("Weather fetch failed, utilizing luxurious offline fallback profiles", err);
-    return defaultWeatherData[name] || defaultWeatherData["Sasebo / 佐世保"];
+    const fallback = defaultWeatherData[name] || defaultWeatherData["Sasebo / 佐世保"];
+    const fallbackBaseTemp = parseInt(fallback.temp);
+    const simulatedHourlyList: Array<{ time: string; temp: string; condition: string }> = [];
+    for (let h = 0; h < 24; h++) {
+      const hourStr = `${String(h).padStart(2, "0")}:00`;
+      const tempDiff = -Math.abs(h - 14) * 0.4 + 3;
+      const finalTemp = Math.round(fallbackBaseTemp + tempDiff);
+      let hCond = "晴";
+      if (fallback.condition.includes("雲")) hCond = "多雲";
+      else if (fallback.condition.includes("雨") && h >= 13 && h <= 17) hCond = "局部雨";
+      else if (h >= 19 || h <= 5) hCond = "晴朗";
+      simulatedHourlyList.push({
+        time: hourStr,
+        temp: `${finalTemp}°C`,
+        condition: hCond
+      });
+    }
+    return {
+      ...fallback,
+      hourly: simulatedHourlyList
+    };
   }
 }

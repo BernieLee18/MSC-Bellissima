@@ -5,10 +5,22 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { 
-  ShieldAlert, Compass, Anchor, Calendar, CloudSun, Wind, Thermometer, Clock, ShieldCheck, Ship, ChevronLeft, ChevronRight, Activity
+  Sun, Cloud, CloudRain, ShieldAlert, Compass, Anchor, Calendar, CloudSun, Wind, Thermometer, Clock, ShieldCheck, Ship, ChevronLeft, ChevronRight, Activity, Crown
 } from "lucide-react";
 import { WeatherInfo } from "../types";
 import { fetchWeather, destinations } from "../utils/weather";
+
+// Helper to render weather condition icon with premium colors
+const getWeatherIcon = (condition: string) => {
+  const cond = condition.toLowerCase();
+  if (cond.includes("雨") || cond.includes("陣雨") || cond.includes("落水") || cond.includes("水")) {
+    return <CloudRain className="w-3.5 h-3.5 text-sky-400 mx-auto" />;
+  }
+  if (cond.includes("雲") || cond.includes("陰") || cond.includes("霧")) {
+    return <Cloud className="w-3.5 h-3.5 text-slate-350 mx-auto" />;
+  }
+  return <Sun className="w-3.5 h-3.5 text-amber-500 mx-auto" />;
+};
 
 interface HeroSectionProps {
   onOpenDeckPlan: () => void;
@@ -70,13 +82,11 @@ export default function HeroSection({
   const handlePrevWeather = () => {
     if (navigator.vibrate) navigator.vibrate(15);
     setActiveWeatherIndex(Math.max(activeWeatherIndex - 1, 0));
-    setShowHourly(false);
   };
 
   const handleNextWeather = () => {
     if (navigator.vibrate) navigator.vibrate(15);
     setActiveWeatherIndex(Math.min(activeWeatherIndex + 1, destinations.length - 1));
-    setShowHourly(false);
   };
 
   const handleGridClick = (gridIndex: number, navPage: string, subTab?: string) => {
@@ -96,249 +106,255 @@ export default function HeroSection({
       
       {/* HEADER HERO LOGO BRIDGES */}
       <header className="text-center pt-2 pb-0.5 select-none">
-        <h1 className="text-xl font-black tracking-[0.24em] font-sans uppercase bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent leading-none">
+        <h1 className="text-xl font-black tracking-[0.06em] font-sans uppercase text-[#2c1d11] leading-none">
           MSC BELLISSIMA
         </h1>
-        <p className="text-[10px] font-extrabold text-amber-500/90 tracking-wider uppercase mt-1 leading-none">
-          Sasebo · Kagoshima <span className="text-slate-405 font-bold font-sans">/ 佐世保 · 鹿兒島</span>
+        <p className="text-[10px] font-extrabold text-amber-800 tracking-wider uppercase mt-1 leading-none">
+          Sasebo · Kagoshima <span className="text-stone-500 font-bold font-sans">/ 佐世保 · 鹿兒島</span>
         </p>
       </header>
 
-      {/* WEATHER LANDSCAPE CAROUSEL CARD */}
-      <article className="px-3">
-        <div className="relative bg-[#13233f]/90 border border-[#233a5f] rounded-2xl p-2 md:p-2.5 shadow-md overflow-hidden">
-          
-          {/* Subtle ocean underlight decoration */}
-          <div className="absolute -right-20 -top-20 w-28 h-28 rounded-full bg-blue-500/10 blur-2xl pointer-events-none" />
-          
-          {/* Main profile row */}
-          <div className="flex justify-between items-center select-none">
-            
-            {/* Left Button */}
-            <button 
-              onClick={handlePrevWeather}
-              disabled={activeWeatherIndex === 0}
-              className={`p-1.5 rounded-lg bg-[#1f304f] border border-[#2d446b] text-white transition-all cursor-pointer ${
-                activeWeatherIndex === 0 ? "opacity-20 pointer-events-none bg-slate-800/50" : "hover:bg-[#2d446b] active:scale-95"
-              }`}
-            >
-              <ChevronLeft className="w-3.5 h-3.5 stroke-[2.5]" />
-            </button>
-
-            {/* Core Destination Weather Detail */}
-            <div className="text-center flex-1 mx-2">
-              <span className="text-[9px] text-amber-400 font-extrabold tracking-wider uppercase bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 leading-none">
-                {currentDest.label} · {currentDest.dateStr}
-              </span>
-              <h2 className="text-xs font-black text-white mt-1 flex items-center justify-center gap-1 leading-none">
-                <CloudSun className="w-3.5 h-3.5 text-amber-400 animate-pulse-slow" />
-                {currentDest.name}
-              </h2>
-              
-              {loading ? (
-                <div className="h-4 flex items-center justify-center mt-1">
-                  <div className="w-3 h-3 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
-                </div>
-              ) : currentWeather ? (
-                <div className="mt-1 flex justify-center items-center gap-1.5 select-none leading-none">
-                  <span className="text-lg font-black text-white font-mono tracking-tighter">
-                    {currentWeather.temp}
-                  </span>
-                  <div className="text-left flex flex-col justify-center">
-                    <p className="text-[10px] text-slate-200 font-bold leading-none">{currentWeather.condition}</p>
-                    <p className="text-[8px] text-slate-400 font-mono flex items-center gap-0.5 mt-0.5 leading-none">
-                      <Wind className="w-2 h-2 text-blue-400" />
-                      {currentWeather.windSpeed}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-[9px] text-red-450 mt-1">無法加載天氣資料</p>
-              )}
-            </div>
-
-            {/* Right Button */}
-            <button 
-              onClick={handleNextWeather}
-              disabled={activeWeatherIndex === destinations.length - 1}
-              className={`p-1.5 rounded-lg bg-[#1f304f] border border-[#2d446b] text-white transition-all cursor-pointer ${
-                activeWeatherIndex === destinations.length - 1 ? "opacity-20 pointer-events-none bg-slate-800/50" : "hover:bg-[#2d446b] active:scale-95"
-              }`}
-            >
-              <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
-            </button>
-
-          </div>
-
-          {/* Dots Indicator */}
-          <div className="flex justify-center gap-1 mt-1 select-none">
-            {destinations.map((_, idx) => (
-              <button
-                key={idx}
+      {/* WEATHER LANDSCAPE SCROLLABLE ROW (左右滑動) */}
+      <article className="px-3 select-none">
+        <div 
+          ref={scrollRef}
+          className="flex gap-2.5 overflow-x-auto pb-1 hover:pb-1 snap-x snap-mandatory scroll-smooth scrollbar-none"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {destinations.map((dest, idx) => {
+            const isSelected = activeWeatherIndex === idx;
+            const weather = weatherProfiles[dest.name];
+            return (
+              <div
+                key={dest.name}
                 onClick={() => {
                   if (navigator.vibrate) navigator.vibrate(15);
                   setActiveWeatherIndex(idx);
-                  setShowHourly(false);
                 }}
-                className={`h-1 rounded-full transition-all cursor-pointer ${
-                  activeWeatherIndex === idx ? "w-3 bg-amber-500" : "w-1 bg-slate-600 hover:bg-slate-500"
+                className={`snap-center shrink-0 w-[245px] relative bg-white border rounded-2xl p-2.5 shadow-sm transition-all duration-300 cursor-pointer ${
+                  isSelected 
+                    ? "border-amber-500 ring-1 ring-amber-500/20 bg-[#fffdf0]" 
+                    : "border-stone-200/90 bg-[#fdfbf6] opacity-80 hover:opacity-100 hover:border-slate-400"
                 }`}
-              />
-            ))}
-          </div>
+              >
+                {/* Header Tag in Card */}
+                <div className="flex justify-between items-center mb-1 leading-none">
+                  <span className="text-[8.5px] text-amber-800 font-extrabold tracking-wider uppercase bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
+                    {dest.label}
+                  </span>
+                  <span className="text-[8.5px] text-stone-500 font-mono font-bold">
+                    {dest.dateStr}
+                  </span>
+                </div>
 
-          {/* Hourly Previews Toggler (Tap to Toggle Inline Drawer) */}
-          {currentWeather && (
-            <div className="mt-1 border-t border-[#233a5f] pt-1 text-center pointer-events-auto">
+                <h3 className="text-xs font-black text-stone-900 flex items-center gap-1 leading-none my-1.5">
+                  <CloudSun className={`w-3.5 h-3.5 ${isSelected ? "text-amber-600 animate-pulse-slow font-bold" : "text-stone-400"}`} />
+                  {dest.name}
+                </h3>
+
+                {loading ? (
+                  <div className="h-5 flex items-center justify-start py-0.5 px-2">
+                    <div className="w-3.5 h-3.5 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+                  </div>
+                ) : weather ? (
+                  <div className="flex items-center gap-2 select-none leading-none mt-1">
+                    <span className="text-lg font-black text-stone-950 font-mono tracking-tighter">
+                      {weather.temp}
+                    </span>
+                    <div className="text-left flex flex-col justify-center gap-0.5">
+                      <p className="text-[9.5px] text-stone-800 font-bold leading-none">{weather.condition}</p>
+                      <p className="text-[8px] text-stone-500 font-mono flex items-center gap-0.5 leading-none">
+                        <Wind className="w-2.5 h-2.5 text-blue-500 flex-shrink-0" />
+                        {weather.windSpeed}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-[8.5px] text-red-500">無法加載天氣</p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Small subtle indicators under the carousel */}
+        <div className="flex justify-center gap-1 mt-1.5 select-none">
+          {destinations.map((_, idx) => (
+            <button
+               key={idx}
+               onClick={() => {
+                 if (navigator.vibrate) navigator.vibrate(15);
+                 setActiveWeatherIndex(idx);
+               }}
+              className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                activeWeatherIndex === idx ? "w-3 bg-amber-600" : "w-1.5 bg-stone-300 hover:bg-stone-450"
+              }`}
+            />
+          ))}
+        </div>
+
+        {/* Hourly Previews Toggler for focused destination weather profile */}
+        {currentWeather && (() => {
+          const now = new Date();
+          const nowYear = now.getFullYear();
+          const nowMonth = String(now.getMonth() + 1).padStart(2, "0");
+          const nowDate = String(now.getDate()).padStart(2, "0");
+          const nowHour = now.getHours();
+          const todayStr = `${nowYear}-${nowMonth}-${nowDate}`;
+
+          const filteredHourly = currentWeather.hourly.filter(h => {
+            if (currentDest.dateStr === todayStr) {
+              const hHour = parseInt(h.time.split(":")[0]);
+              return hHour >= nowHour;
+            }
+            return true;
+          });
+
+          return (
+            <div className="mt-2 bg-[#fffdf6] border border-stone-200/80 p-2 rounded-xl text-center shadow-inner">
               <button 
                 onClick={() => {
                   if (navigator.vibrate) navigator.vibrate(20);
                   setShowHourly(!showHourly);
                 }}
-                className="text-[9px] text-slate-300 font-extrabold tracking-wider uppercase hover:text-amber-400 active:scale-95 transition-all inline-flex items-center gap-0.5 select-none cursor-pointer leading-none"
+                className="text-[9.5px] text-stone-850 font-extrabold tracking-wider uppercase hover:text-amber-800 active:scale-95 transition-all inline-flex items-center gap-1 select-none cursor-pointer leading-none"
               >
-                <Clock className="w-3 h-3 text-amber-500" />
-                <span>{showHourly ? "關閉 24H" : "展開 24H 氣溫預報"}</span>
+                <Clock className="w-3.5 h-3.5 text-amber-600" />
+                <span>{showHourly ? "關閉 逐小時預報" : `展開 ${currentDest.name.split("/")[1] || currentDest.name} 逐小時氣溫預報`}</span>
               </button>
 
               {/* Hourly sliding carousel axis */}
               {showHourly && (
-                <div className="flex gap-1 overflow-x-auto pt-1 pb-0.5 select-text scroll-smooth" id="hourly-carousel">
-                  {currentWeather.hourly.map((h, hIdx) => (
-                    <div 
-                      key={hIdx} 
-                      className="min-w-[44px] bg-[#1a2c4e] p-1 rounded-lg border border-[#2d446b] text-center flex-shrink-0"
-                    >
-                      <span className="text-[8px] text-slate-400 font-mono font-bold block mb-0.5">{h.time}</span>
-                      <span className="text-[10px] font-black text-white font-mono block mb-0.5">{h.temp}</span>
-                      <span className="text-[8px] font-bold text-amber-405 block">{h.condition}</span>
+                <div className="flex gap-1.5 overflow-x-auto pt-2 pb-0.5 select-text scroll-smooth" id="hourly-carousel">
+                  {filteredHourly.length > 0 ? (
+                    filteredHourly.map((h, hIdx) => (
+                      <div 
+                        key={hIdx} 
+                        className="min-w-[46px] bg-white p-1.5 rounded-lg border border-stone-150 text-center flex-shrink-0 flex flex-col items-center justify-center gap-0.5 shadow-sm"
+                      >
+                        <span className="text-[8.5px] text-stone-500 font-mono font-bold block">{h.time}</span>
+                        <span className="text-[10px] font-extrabold text-stone-900 font-mono block">{h.temp}</span>
+                        <div className="mt-0.5 flex items-center justify-center h-4 w-4">
+                          {getWeatherIcon(h.condition)}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-2 text-stone-500 text-[10px] sm:text-xs">
+                      目前時段已無後續逐小時預報
                     </div>
-                  ))}
+                  )}
                 </div>
               )}
             </div>
-          )}
-
-        </div>
+          );
+        })()}
       </article>
 
-      {/* HIGH-END SYMMETRICAL 2x3 ICON GRID (LARGE MAIN TOUCH TARGET) */}
-      <article className="px-3 mt-1 select-none">
+      {/* HIGH-END SYMMETRICAL 2x3 UNIFIED GRID WITH SILK-GOLD BONE CONTEXT */}
+      <article className="px-3 mt-3.5 select-none">
         <div className="grid grid-cols-2 gap-2.5 w-full">
-          
-          {/* Card 1: Explore Deck Plan */}
+          {/* Card 1: Explore */}
           <button
             onClick={() => {
               if (navigator.vibrate) navigator.vibrate(25);
               onOpenDeckPlan();
             }}
-            className="p-3 rounded-2xl bg-[#14233c]/90 border border-[#233a5f] flex items-center gap-2.5 text-left relative overflow-hidden group active:scale-95 hover:border-amber-500 shadow-md transition-all cursor-pointer h-[74px] sm:h-[80px]"
+            className="px-2 py-3 rounded-2xl bg-[#f4edd9]/90 border border-[#e6dec8] flex items-center gap-1.5 text-left relative overflow-hidden group active:scale-95 shadow-sm hover:shadow-md hover:bg-[#ebdfcc] transition-all cursor-pointer h-[98px] sm:h-[104px]"
             id="tool-explore-deck"
           >
-            <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 group-hover:scale-105 transition-transform flex-shrink-0">
+            <div className="p-2 rounded-xl bg-orange-100/50 text-amber-900 group-hover:bg-amber-150 group-hover:text-amber-905 transition-colors flex-shrink-0">
               <Compass className="w-[18px] h-[18px] stroke-[2.2]" />
             </div>
-            <div className="flex flex-col min-w-0 leading-tight">
-              <h4 className="text-[11px] font-black uppercase tracking-tight text-white leading-tight">
-                EXPLORE DECK <span className="text-amber-450 font-sans block text-[10px] font-bold mt-0.5">探索郵輪地圖</span>
-              </h4>
-              <p className="text-[9px] text-slate-300 font-bold mt-0.5">查看各層設施佈局</p>
+            <div className="flex flex-col min-w-0 leading-tight flex-1">
+              <span className="text-[8.5px] font-mono font-bold text-amber-800 tracking-wide uppercase leading-none mb-1">EXPLORE</span>
+              <span className="text-[15.5px] sm:text-[16.5px] font-black text-stone-900 leading-none py-0.5">郵輪地圖</span>
+              <span className="text-[8.5px] min-[360px]:text-[9.5px] text-stone-600 font-bold mt-1 block whitespace-nowrap tracking-tight">查看各層設施佈局</span>
             </div>
           </button>
 
-          {/* Card 2: MSC Yacht Club (AUTHENTIC GOLD ON NAVY LOGO) */}
+          {/* Card 2: MSC Yacht Club */}
           <button
             onClick={() => handleGridClick(1, "yacht_club")}
-            className="p-3 rounded-2xl bg-[#14233c]/90 border border-amber-500/40 flex items-center gap-2.5 text-left relative overflow-hidden group active:scale-95 hover:border-amber-500 shadow-md transition-all cursor-pointer h-[74px] sm:h-[80px]"
+            className="px-2 py-3 rounded-2xl bg-[#f4edd9]/90 border border-[#e6dec8] flex items-center gap-1.5 text-left relative overflow-hidden group active:scale-95 shadow-sm hover:shadow-md hover:bg-[#ebdfcc] transition-all cursor-pointer h-[98px] sm:h-[104px]"
             id="tool-yacht-club"
           >
-            <div className="w-[34px] h-[34px] rounded-full overflow-hidden border border-amber-500/40 flex-shrink-0 bg-[#070e1b] flex items-center justify-center p-0.5 group-hover:scale-105 transition-transform shadow-md">
-              <img 
-                src="/src/assets/images/yacht_club_lotus_logo_1780043451979.png" 
-                alt="MSC Yacht Club Icon" 
-                className="w-full h-full object-contain"
-                referrerPolicy="no-referrer"
-              />
+            <div className="p-2 rounded-xl bg-orange-100/50 text-amber-900 group-hover:bg-amber-150 group-hover:text-amber-905 transition-colors flex-shrink-0">
+              <Crown className="w-[18px] h-[18px] stroke-[2.2]" />
             </div>
-            <div className="flex flex-col min-w-0 leading-tight">
-              <h4 className="text-[11px] font-black uppercase tracking-tight text-amber-455 leading-tight">
-                YACHT CLUB <span className="text-white font-sans block text-[10px] font-bold mt-0.5">尊享遊艇會</span>
-              </h4>
-              <p className="text-[9px] text-slate-300 font-bold mt-0.5">尊榮船中船貴賓攻略</p>
+            <div className="flex flex-col min-w-0 leading-tight flex-1">
+              <span className="text-[8.5px] font-mono font-bold text-amber-800 tracking-wide uppercase leading-none mb-1">YACHT CLUB</span>
+              <span className="text-[15.5px] sm:text-[16.5px] font-black text-stone-900 leading-none py-0.5">地中海遊艇會</span>
+              <span className="text-[8.5px] min-[360px]:text-[9.5px] text-stone-600 font-bold mt-1 block whitespace-nowrap tracking-tight">尊榮船中船貴賓攻略</span>
             </div>
           </button>
 
           {/* Card 3: Sasebo */}
           <button
             onClick={() => handleGridClick(2, "port", "sasebo")}
-            className="p-3 rounded-2xl bg-[#14233c]/90 border border-[#233a5f] hover:border-amber-500 flex items-center gap-2.5 text-left relative overflow-hidden group active:scale-95 transition-all duration-300 border cursor-pointer h-[74px] sm:h-[80px]"
+            className="px-2 py-3 rounded-2xl bg-[#f4edd9]/90 border border-[#e6dec8] flex items-center gap-1.5 text-left relative overflow-hidden group active:scale-95 shadow-sm hover:shadow-md hover:bg-[#ebdfcc] transition-all cursor-pointer h-[98px] sm:h-[104px]"
             id="tool-sasebo"
           >
-            <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 group-hover:scale-105 transition-transform flex-shrink-0">
+            <div className="p-2 rounded-xl bg-orange-100/50 text-amber-900 group-hover:bg-amber-150 group-hover:text-amber-905 transition-colors flex-shrink-0">
               <Anchor className="w-[18px] h-[18px] stroke-[2.2]" />
             </div>
-            <div className="flex flex-col min-w-0 leading-tight">
-              <h4 className="text-[11px] font-black uppercase tracking-tight text-white leading-tight">
-                SASEBO <span className="text-amber-400 font-sans block text-[10px] font-bold mt-0.5">佐世保港</span>
-              </h4>
-              <p className="text-[9px] text-slate-300 font-bold mt-0.5">08:00 抵 ‧ 20:00 啟</p>
+            <div className="flex flex-col min-w-0 leading-tight flex-1">
+              <span className="text-[8.5px] font-mono font-bold text-amber-800 tracking-wide uppercase leading-none mb-1">SASEBO</span>
+              <span className="text-[15.5px] sm:text-[16.5px] font-black text-stone-900 leading-none py-0.5">佐世保</span>
+              <span className="text-[8px] min-[360px]:text-[8.5px] sm:text-[9px] text-stone-600 font-extrabold mt-1 block whitespace-nowrap tracking-tighter">08:00抵達 ‧ 20:00啟航</span>
             </div>
           </button>
 
           {/* Card 4: Kagoshima */}
           <button
             onClick={() => handleGridClick(3, "port", "kagoshima")}
-            className="p-3 rounded-2xl bg-[#14233c]/90 border border-[#233a5f] hover:border-amber-500 flex items-center gap-2.5 text-left relative overflow-hidden group active:scale-95 transition-all duration-300 border cursor-pointer h-[74px] sm:h-[80px]"
+            className="px-2 py-3 rounded-2xl bg-[#f4edd9]/90 border border-[#e6dec8] flex items-center gap-1.5 text-left relative overflow-hidden group active:scale-95 shadow-sm hover:shadow-md hover:bg-[#ebdfcc] transition-all cursor-pointer h-[98px] sm:h-[104px]"
             id="tool-kagoshima"
           >
-            <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 group-hover:scale-105 transition-transform flex-shrink-0">
+            <div className="p-2 rounded-xl bg-orange-100/50 text-amber-900 group-hover:bg-amber-150 group-hover:text-amber-905 transition-colors flex-shrink-0">
               <Anchor className="w-[18px] h-[18px] stroke-[2.2]" />
             </div>
-            <div className="flex flex-col min-w-0 leading-tight">
-              <h4 className="text-[11px] font-black uppercase tracking-tight text-white leading-tight">
-                KAGOSHIMA <span className="text-amber-400 font-sans block text-[10px] font-bold mt-0.5">鹿兒島港</span>
-              </h4>
-              <p className="text-[9px] text-slate-300 font-bold mt-0.5">09:00 抵 ‧ 20:00 啟</p>
+            <div className="flex flex-col min-w-0 leading-tight flex-1">
+              <span className="text-[8.5px] font-mono font-bold text-amber-800 tracking-wide uppercase leading-none mb-1">KAGOSHIMA</span>
+              <span className="text-[15.5px] sm:text-[16.5px] font-black text-stone-900 leading-none py-0.5">鹿兒島</span>
+              <span className="text-[8px] min-[360px]:text-[8.5px] sm:text-[9px] text-stone-600 font-extrabold mt-1 block whitespace-nowrap tracking-tighter">09:00抵達 ‧ 20:00啟航</span>
             </div>
           </button>
 
-          {/* Card 5: Onboard 6/25 */}
+          {/* Card 5: Onboard */}
           <button
             onClick={() => handleGridClick(4, "info", "onboard")}
-            className="p-3 rounded-2xl bg-[#14233c]/90 border border-[#233a5f] hover:border-amber-500 flex items-center gap-2.5 text-left relative overflow-hidden group active:scale-95 transition-all duration-300 border cursor-pointer h-[74px] sm:h-[80px]"
+            className="px-2 py-3 rounded-2xl bg-[#f4edd9]/90 border border-[#e6dec8] flex items-center gap-1.5 text-left relative overflow-hidden group active:scale-95 shadow-sm hover:shadow-md hover:bg-[#ebdfcc] transition-all cursor-pointer h-[98px] sm:h-[104px]"
             id="tool-onboard"
           >
-            <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 group-hover:scale-105 transition-transform flex-shrink-0">
+            <div className="p-2 rounded-xl bg-orange-100/50 text-amber-900 group-hover:bg-amber-150 group-hover:text-amber-905 transition-colors flex-shrink-0">
               <Ship className="w-[18px] h-[18px] stroke-[2.2]" />
             </div>
-            <div className="flex flex-col min-w-0 leading-tight">
-              <h4 className="text-[11px] font-black uppercase tracking-tight text-white leading-tight">
-                ONBOARD <span className="text-amber-400 font-sans block text-[10px] font-bold mt-0.5">登船啟程</span>
-              </h4>
-              <p className="text-[9px] text-slate-300 font-bold mt-0.5">06/25 ‧ 17:00 啟航</p>
+            <div className="flex flex-col min-w-0 leading-tight flex-1">
+              <span className="text-[8.5px] font-mono font-bold text-amber-800 tracking-wide uppercase leading-none mb-1">ONBOARD</span>
+              <span className="text-[15.5px] sm:text-[16.5px] font-black text-stone-900 leading-none py-0.5">登船日</span>
+              <span className="text-[8px] min-[360px]:text-[8.5px] sm:text-[9px] text-stone-600 font-extrabold mt-1 block whitespace-nowrap tracking-tighter">06/25 ‧ 17:00 啟航</span>
             </div>
           </button>
 
-          {/* Card 6: Ashore 6/30 */}
+          {/* Card 6: Ashore */}
           <button
             onClick={() => handleGridClick(5, "info", "offboard")}
-            className="p-3 rounded-2xl bg-[#14233c]/90 border border-[#233a5f] hover:border-amber-500 flex items-center gap-2.5 text-left relative overflow-hidden group active:scale-95 transition-all duration-300 border cursor-pointer h-[74px] sm:h-[80px]"
+            className="px-2 py-3 rounded-2xl bg-[#f4edd9]/90 border border-[#e6dec8] flex items-center gap-1.5 text-left relative overflow-hidden group active:scale-95 shadow-sm hover:shadow-md hover:bg-[#ebdfcc] transition-all cursor-pointer h-[98px] sm:h-[104px]"
             id="tool-offboard"
           >
-            <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 group-hover:scale-105 transition-transform flex-shrink-0">
+            <div className="p-2 rounded-xl bg-orange-100/50 text-amber-900 group-hover:bg-amber-150 group-hover:text-amber-905 transition-colors flex-shrink-0">
               <Calendar className="w-[18px] h-[18px] stroke-[2.2]" />
             </div>
-            <div className="flex flex-col min-w-0 leading-tight">
-              <h4 className="text-[11px] font-black uppercase tracking-tight text-white leading-tight">
-                ASHORE <span className="text-amber-400 font-sans block text-[10px] font-bold mt-0.5">返港離船</span>
-              </h4>
-              <p className="text-[9px] text-slate-300 font-bold mt-0.5">06/30 ‧ 06:00 抵境</p>
+            <div className="flex flex-col min-w-0 leading-tight flex-1">
+              <span className="text-[8.5px] font-mono font-bold text-amber-800 tracking-wide uppercase leading-none mb-1">ASHORE</span>
+              <span className="text-[15.5px] sm:text-[16.5px] font-black text-stone-900 leading-none py-0.5">離船日</span>
+              <span className="text-[8px] min-[360px]:text-[8.5px] sm:text-[9px] text-stone-600 font-extrabold mt-1 block whitespace-nowrap tracking-tighter">06/30 ‧ 06:00 抵達</span>
             </div>
           </button>
 
         </div>
       </article>
-
     </section>
   );
 }

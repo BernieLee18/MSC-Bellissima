@@ -31,6 +31,7 @@ const CATEGORY_TAGS = {
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>("home"); // "home" | "info" | "port" | "yacht_club"
   const [openDeckPlan, setOpenDeckPlan] = useState<boolean>(false);
+  const [selectedMapFacility, setSelectedMapFacility] = useState<Facility | null>(null);
   const [activeWeatherIndex, setActiveWeatherIndex] = useState<number>(1); // Default to Sasebo (6/27)
 
   // Subtab preset buffers to sync across button clicks
@@ -128,10 +129,10 @@ export default function App() {
               setActiveWeatherIndex={setActiveWeatherIndex}
             />
 
-            {/* HIGH END INTEGRATED SEARCH & FULL DETAILED FACILITIES CARD CORNER */}
+            {/* HIGH END INTEGRATED SEARCH & FULL DETAILED FACILITIES */}
             <section className="px-1 space-y-4">
               
-              {/* 頂部快速入口（Hybrid Grid - Compact h-[46px] to let 2x3 dominate） */}
+              {/* 頂部快速入口（Hybrid Grid - Compact h-[58px] for perfect vertical aesthetics and alignment） */}
               <div className="grid grid-cols-6 gap-2 pt-1 select-none w-full">
                 {/* 上層 1x2 大網格（Dining 餐廳 / Bar & Lounge 酒吧） */}
                 <button
@@ -139,16 +140,17 @@ export default function App() {
                     if (navigator.vibrate) navigator.vibrate(15);
                     setSelectedCategory(selectedCategory === "餐廳" ? "all" : "餐廳");
                   }}
-                  className={`col-span-3 h-[46px] flex flex-col justify-center items-center py-1 px-1 rounded-xl cursor-pointer transition-all duration-300 border text-center ${
+                  className={`col-span-3 h-[58px] sm:h-[62px] flex flex-col justify-center items-center py-1.5 px-1 rounded-xl cursor-pointer transition-all duration-300 border text-center ${
                     selectedCategory === "餐廳"
-                      ? "bg-rose-500/15 border-rose-500/50 text-rose-300 shadow-md ring-1 ring-rose-500/25"
-                      : "bg-[#14233c]/80 border-[#223554] text-slate-300 hover:text-white"
+                      ? "bg-amber-50/90 border-amber-400 text-amber-950 shadow-sm scale-[1.01]"
+                      : "bg-white border-slate-200/90 text-slate-800 hover:bg-slate-50"
                   }`}
                 >
-                  <div className="flex items-center gap-1.5">
-                    <Utensils className={`w-3.5 h-3.5 ${selectedCategory === "餐廳" ? "text-rose-400" : "text-slate-400"}`} />
-                    <span className="text-[10px] font-bold mt-0.5 leading-none">美食餐廳</span>
-                  </div>
+                  <Utensils className={`w-3.5 h-3.5 mb-0.5 ${selectedCategory === "餐廳" ? "text-amber-600" : "text-slate-500"}`} />
+                  <span className="text-[13px] sm:text-[14px] font-black leading-none">美食餐廳</span>
+                  <span className={`text-[7px] sm:text-[8px] font-mono tracking-wider mt-1 uppercase font-bold leading-none ${selectedCategory === "餐廳" ? "text-amber-805" : "text-slate-400"}`}>
+                    DINING & BARS
+                  </span>
                 </button>
 
                 <button
@@ -156,16 +158,17 @@ export default function App() {
                     if (navigator.vibrate) navigator.vibrate(15);
                     setSelectedCategory(selectedCategory === "酒吧" ? "all" : "酒吧");
                   }}
-                  className={`col-span-3 h-[46px] flex flex-col justify-center items-center py-1 px-1 rounded-xl cursor-pointer transition-all duration-300 border text-center ${
+                  className={`col-span-3 h-[58px] sm:h-[62px] flex flex-col justify-center items-center py-1.5 px-1 rounded-xl cursor-pointer transition-all duration-300 border text-center ${
                     selectedCategory === "酒吧"
-                      ? "bg-amber-500/15 border-amber-500/50 text-amber-300 shadow-md ring-1 ring-amber-500/25"
-                      : "bg-[#14233c]/80 border-[#223554] text-slate-300 hover:text-white"
+                      ? "bg-amber-50/90 border-[#fbbf24] text-amber-950 shadow-sm scale-[1.01]"
+                      : "bg-white border-slate-200/90 text-slate-800 hover:bg-slate-50"
                   }`}
                 >
-                  <div className="flex items-center gap-1.5">
-                    <Wine className={`w-3.5 h-3.5 ${selectedCategory === "酒吧" ? "text-amber-400" : "text-slate-400"}`} />
-                    <span className="text-[10px] font-bold mt-0.5 leading-none">酒吧</span>
-                  </div>
+                  <Wine className={`w-3.5 h-3.5 mb-0.5 ${selectedCategory === "酒吧" ? "text-amber-600" : "text-slate-500"}`} />
+                  <span className="text-[13px] sm:text-[14px] font-black leading-none">酒吧</span>
+                  <span className={`text-[7px] sm:text-[8px] font-mono tracking-wider mt-1 uppercase font-bold leading-none ${selectedCategory === "酒吧" ? "text-amber-805" : "text-slate-400"}`}>
+                    BARS & LOUNGES
+                  </span>
                 </button>
 
                 {/* 下層 1x3 精巧網格（Services 旅客服務 / Entertainment 購物與休閒娛樂 / Pool & Outdoor 水上與戶外娛樂） */}
@@ -174,16 +177,17 @@ export default function App() {
                     if (navigator.vibrate) navigator.vibrate(15);
                     setSelectedCategory(selectedCategory === "旅客服務" ? "all" : "旅客服務");
                   }}
-                  className={`col-span-2 h-[46px] flex flex-col justify-center items-center py-1 px-1 rounded-xl cursor-pointer transition-all duration-300 border text-center ${
+                  className={`col-span-2 h-[58px] sm:h-[62px] flex flex-col justify-center items-center py-1.5 px-0.5 rounded-xl cursor-pointer transition-all duration-300 border text-center ${
                     selectedCategory === "旅客服務"
-                      ? "bg-sky-500/15 border-sky-500/50 text-sky-300 shadow-md ring-1 ring-sky-500/25"
-                      : "bg-[#14233c]/80 border-[#223554] text-slate-300 hover:text-white"
+                      ? "bg-amber-50/90 border-[#fbbf24] text-[#451a03] shadow-sm scale-[1.01]"
+                      : "bg-white border-slate-200/90 text-slate-800 hover:bg-slate-50"
                   }`}
                 >
-                  <div className="flex items-center gap-1.5">
-                    <ShieldCheck className={`w-3.5 h-3.5 ${selectedCategory === "旅客服務" ? "text-sky-400" : "text-slate-400"}`} />
-                    <span className="text-[10px] font-bold mt-0.5 leading-none">旅客服務</span>
-                  </div>
+                  <ShieldCheck className={`w-3.5 h-3.5 mb-0.5 ${selectedCategory === "旅客服務" ? "text-amber-600" : "text-slate-500"}`} />
+                  <span className="text-[11.5px] sm:text-[12.5px] font-black leading-none">旅客服務</span>
+                  <span className={`text-[7px] sm:text-[8.5px] font-mono tracking-wider mt-1 uppercase font-bold leading-none ${selectedCategory === "旅客服務" ? "text-amber-805" : "text-slate-400"}`}>
+                    SERVICES
+                  </span>
                 </button>
 
                 <button
@@ -191,16 +195,17 @@ export default function App() {
                     if (navigator.vibrate) navigator.vibrate(15);
                     setSelectedCategory(selectedCategory === "購物與休閒娛樂" ? "all" : "購物與休閒娛樂");
                   }}
-                  className={`col-span-2 h-[46px] flex flex-col justify-center items-center py-1 px-1 rounded-xl cursor-pointer transition-all duration-300 border text-center ${
+                  className={`col-span-2 h-[58px] sm:h-[62px] flex flex-col justify-center items-center py-1.5 px-0.5 rounded-xl cursor-pointer transition-all duration-300 border text-center ${
                     selectedCategory === "購物與休閒娛樂"
-                      ? "bg-indigo-500/15 border-indigo-500/50 text-indigo-300 shadow-md ring-1 ring-indigo-500/25"
-                      : "bg-[#14233c]/80 border-[#223554] text-slate-300 hover:text-white"
+                      ? "bg-amber-50/90 border-[#fbbf24] text-[#451a03] shadow-sm scale-[1.01]"
+                      : "bg-white border-slate-200/90 text-slate-800 hover:bg-slate-50"
                   }`}
                 >
-                  <div className="flex items-center gap-1.5">
-                    <Sparkles className={`w-3.5 h-3.5 ${selectedCategory === "購物與休閒娛樂" ? "text-indigo-400" : "text-slate-400"}`} />
-                    <span className="text-[10px] font-bold mt-0.5 leading-none">休閒娛樂</span>
-                  </div>
+                  <Sparkles className={`w-3.5 h-3.5 mb-0.5 ${selectedCategory === "購物與休閒娛樂" ? "text-amber-600" : "text-slate-500"}`} />
+                  <span className="text-[11.5px] sm:text-[12.5px] font-black leading-none">休閒娛樂</span>
+                  <span className={`text-[7px] sm:text-[8.5px] font-mono tracking-wider mt-1 uppercase font-bold leading-none ${selectedCategory === "購物與休閒娛樂" ? "text-amber-805" : "text-slate-400"}`}>
+                    ENTERTAIN
+                  </span>
                 </button>
 
                 <button
@@ -208,16 +213,17 @@ export default function App() {
                     if (navigator.vibrate) navigator.vibrate(15);
                     setSelectedCategory(selectedCategory === "水上與戶外娛樂" ? "all" : "水上與戶外娛樂");
                   }}
-                  className={`col-span-2 h-[46px] flex flex-col justify-center items-center py-1 px-1 rounded-xl cursor-pointer transition-all duration-300 border text-center ${
+                  className={`col-span-2 h-[58px] sm:h-[62px] flex flex-col justify-center items-center py-1.5 px-0.5 rounded-xl cursor-pointer transition-all duration-300 border text-center ${
                     selectedCategory === "水上與戶外娛樂"
-                      ? "bg-emerald-500/15 border-emerald-500/50 text-emerald-300 shadow-md ring-1 ring-emerald-500/25"
-                      : "bg-[#14233c]/80 border-[#223554] text-slate-300 hover:text-white"
+                      ? "bg-amber-50/90 border-[#fbbf24] text-[#451a03] shadow-sm scale-[1.01]"
+                      : "bg-white border-slate-200/90 text-slate-800 hover:bg-slate-50"
                   }`}
                 >
-                  <div className="flex items-center gap-1.5">
-                    <Anchor className={`w-3.5 h-3.5 ${selectedCategory === "水上與戶外娛樂" ? "text-emerald-400" : "text-slate-400"}`} />
-                    <span className="text-[10px] font-bold mt-0.5 leading-none">水上戶外</span>
-                  </div>
+                  <Anchor className={`w-3.5 h-3.5 mb-0.5 ${selectedCategory === "水上與戶外娛樂" ? "text-amber-600" : "text-slate-500"}`} />
+                  <span className="text-[11px] sm:text-[12px] font-black leading-none">水上戶外</span>
+                  <span className={`text-[7px] sm:text-[8px] font-mono tracking-wider mt-1 uppercase font-bold leading-none ${selectedCategory === "水上與戶外娛樂" ? "text-amber-805" : "text-slate-400"}`}>
+                    OUTDOOR
+                  </span>
                 </button>
               </div>
 
@@ -378,7 +384,7 @@ export default function App() {
                                 <Award className="w-4.5 h-4.5 text-amber-400 flex-shrink-0 mt-0.5" />
                               )}
                               <div>
-                                <p className="font-black text-amber-305">👑 尊榮特權權益 (Privilege Note)</p>
+                                <p className="font-black text-amber-305">👑 尊榮禮遇權益 (Privilege Note)</p>
                                 <p className="text-amber-300 font-semibold mt-0.5">{f.privilege}</p>
                               </div>
                             </div>
@@ -390,6 +396,7 @@ export default function App() {
                               <button
                                 onClick={() => {
                                   if (navigator.vibrate) navigator.vibrate(20);
+                                  setSelectedMapFacility(f);
                                   setOpenDeckPlan(true);
                                 }}
                                 className="text-[10.5px] text-amber-400 hover:text-amber-350 font-extrabold tracking-widest uppercase flex items-center gap-0.5 cursor-pointer bg-transparent border-none"
@@ -438,8 +445,12 @@ export default function App() {
       {/* FULL SCREEN LIGHTBOX: DECK PLAN MAP MODAL MODULE */}
       <DeckPlanModal 
         isOpen={openDeckPlan}
-        onClose={() => setOpenDeckPlan(false)}
+        onClose={() => {
+          setOpenDeckPlan(false);
+          setSelectedMapFacility(null);
+        }}
         initialDeck={selectedDeckFilter !== "all" ? parseInt(selectedDeckFilter) : 15}
+        initialFacility={selectedMapFacility}
         onSelectFacilityDetail={handleSelectFacilityDetailAndScroll}
       />
 

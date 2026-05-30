@@ -138,19 +138,16 @@ export default function InformationSection({ initialSubTab = "prep" }: Informati
 
             {/* DYNAMIC COMPREHENSIVE TIMELINE CHECKLIST SEGMENTS */}
             <div className="space-y-3">
-              <div className="flex justify-between items-center px-1">
-                <h3 className="text-xs font-black text-slate-600 tracking-wider">
-                  💼 互動式行前行李數位 Checklist
-                </h3>
+              <div className="flex justify-end items-center px-1">
                 <button
                   onClick={() => {
                     if (navigator.vibrate) navigator.vibrate(30);
                     setCheckedItems({});
                     localStorage.removeItem("msc_pack_checks");
                   }}
-                  className="text-[10px] text-amber-700 font-extrabold tracking-widest hover:underline cursor-pointer"
+                  className="text-[10px] sm:text-xs text-amber-400 font-extrabold tracking-widest hover:underline cursor-pointer"
                 >
-                  重設全部
+                  重設全部清單
                 </button>
               </div>
 
@@ -189,9 +186,6 @@ export default function InformationSection({ initialSubTab = "prep" }: Informati
 
             {/* VOLTAGE POWER CHARGING & SS PHARMACY GUIDELINES COG */}
             <div className="space-y-2.5">
-              <h3 className="text-xs font-black text-slate-600 tracking-wider pl-1">
-                📖 實用客房插頭與藥庫貼心提示
-              </h3>
 
               {/* Sub-accordion 1: Sockets and Cords */}
               <div className="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm">
@@ -224,18 +218,18 @@ export default function InformationSection({ initialSubTab = "prep" }: Informati
                   className="w-full flex justify-between p-3.5 text-left text-xs font-black text-slate-800 items-center cursor-pointer hover:bg-slate-50"
                 >
                   <span className="flex items-center gap-2">💊 暈船神藥：SS製藥白兔牌詳解</span>
-                  <span className="text-[10px] text-rose-700 font-black">長輩兒童注意</span>
+                  <span className="text-[10px] sm:text-xs text-rose-500 font-black">隨行備藥提醒</span>
                 </button>
                 {expandedPrep === "sickness_pills" && (
                   <div className="p-3.5 border-t border-slate-150 text-[12px] text-slate-705 leading-relaxed bg-slate-50 space-y-1.5 font-medium">
                     <p className="text-slate-700 font-semibold">
-                      船頭與高層風浪較大時偶有搖晃。家長備妥日本最著名<strong>「SS製藥藍白兔牌（Elesin）」</strong>：
+                      船頭與高層風浪較大時偶有搖晃，建議備妥日本最著名<strong>「SS製藥藍白兔牌（Elesin）」</strong>：
                     </p>
                     <p className="text-slate-700">
                       <strong>● 劑量規範：</strong> 15 歲及以上成人，每次服用 <span className="text-slate-900 font-black">1 粒（每日限服用一次）</span>。請在登船、靠港出門或船起航前約 <strong className="text-amber-700 font-black">30 分鐘</strong> 以溫水送服，即可完美壓制 24 小時內所有顛簸暈厥。
                     </p>
                     <p className="text-slate-700">
-                      <strong>● 嚴禁對象：</strong> <span className="text-rose-700 font-extrabold">15 歲以下兒童與幼兒禁止服用成人款兔牌！</span> 5 歲以上小童請購買兒童蜜糖風味糖粒款；幼嫩 2 歲嬰童禁用成分，請諮詢醫生常備。
+                      <strong>● 嚴禁對象：</strong> <span className="text-rose-700 font-extrabold">15 歲以下成員禁止服用成人款兔牌！</span> 5 歲以上請選用專屬兒童款；幼童因成分考量，服用前請務必諮詢專業醫師。
                     </p>
                     <p className="text-[10.5px] text-slate-500 font-bold">
                       （本藥含有抗組胺等助眠成分，服用後可能會產生微弱倦怠與渴睡感，服藥後多躺在 19 層日光躺椅閉目吹風更佳）
@@ -271,7 +265,7 @@ export default function InformationSection({ initialSubTab = "prep" }: Informati
               <div className="mt-4 bg-slate-55 p-3.5 rounded-2xl border border-slate-200 text-xs text-slate-700 space-y-2 font-semibold">
                 <p>● <strong className="text-slate-900">上車時間：</strong> 2026-06-25 上午 08:00 準時發車</p>
                 <p>● <strong className="text-slate-900">出發目的地：</strong> 直奔基隆港西岸旅客中心（西二西三碼頭通航大樓）</p>
-                <p>● <strong className="text-slate-900">隨行配置：</strong> 6 位尊榮家庭旅客、4 件長途大行李，加配一組 1 ~ 3 歲幼兒專屬防護安全座椅。</p>
+                <p>● <strong className="text-slate-900">隨行配置：</strong> 6 位隨行貴賓、4 件大行李，並配置一組兒童專屬防護安全座椅。</p>
                 
                 <a 
                   href="https://maps.google.com/?q=Keelung+Port+West+Passenger+Terminal"
@@ -286,16 +280,16 @@ export default function InformationSection({ initialSubTab = "prep" }: Informati
             </div>
 
             {/* BUTLER TERMINAL PASSAGE INSTRUCTION COGNITION */}
-            <div className="p-4 rounded-3xl bg-amber-50/60 border border-amber-200 text-xs leading-relaxed text-slate-700 shadow-sm">
+            <div className="p-4 rounded-3xl bg-white border border-amber-300 text-xs sm:text-sm leading-relaxed text-slate-800 shadow-md">
               <div className="flex gap-2 items-center text-amber-800 font-extrabold mb-2">
-                <ShieldCheck className="w-5 h-5 text-amber-700" />
-                <span className="text-xs font-black">Yacht Club 優先通關攻略（基隆碼頭）</span>
+                <ShieldCheck className="w-5 h-5 text-amber-600" />
+                <span className="text-sm font-black">Yacht Club 優先通關禮遇（基隆碼頭）</span>
               </div>
               <p className="text-slate-700 font-semibold text-justify">
-                <strong>不要去跟普通排隊大隊人馬擠在一起！</strong><br />
-                到逹基隆港西客運碼頭後，找尋帶有金色<strong>「MSC Yacht Club」</strong>鮮明指示牌的貴賓通道。當班 YC 管家與碼頭客服專員早已在貴賓通道入口和專門貴賓室迎候。<br />
-                您享有的<strong>優先托運行李權</strong>：管家會直接親自為您的行李綁上金色特殊 priority tag，之後行李將直接由 VIP 專用梯以最高速免檢查直達您的 14F-19F 套房門口。<br />
-                隨後，在優雅、提供各色進口果汁和精緻冷切香檳的貴賓專區內，現場由專員全程助辦船卡快速完成綁定信用卡，專用貴賓廊橋一秒快速優先登船！
+                <strong>無需參與普通旅客的漫長排隊！</strong><br />
+                抵達基隆港西客運碼頭後，請直接前往設有金色<strong>「MSC Yacht Club」</strong>鮮明標誌的貴賓通道。專屬 YC 管家與禮賓人員已在貴賓通道入口與 VIP 專屬貴賓室恭候。<br />
+                您享有的<strong>優先行李托運服務</strong>：管家將親自為您的行李拴上金色專屬優先行李牌，隨後由專用通道直接運送至您 14F-19F 的套房門口。<br />
+                在享用精緻點心與特調飲品的同時，現場專員將協助您快速辦理船卡並綁定信用卡，隨後經由 VIP 專用廊橋優先登船！
               </p>
             </div>
           </div>
@@ -323,21 +317,21 @@ export default function InformationSection({ initialSubTab = "prep" }: Informati
               <div className="mt-4 bg-slate-55 p-3.5 rounded-2xl border border-slate-202 text-xs text-slate-700 space-y-2 font-semibold">
                 <p>● <strong className="text-slate-900">接送地點：</strong> 基隆港口西岸旅客通關出口處（外側專用接載車道）</p>
                 <p>● <strong className="text-slate-900">約定時間：</strong> 2026-06-30 上午 09:45 準時在此發車返程（司機電話與車牌，登船當晚將在 YC 每日節目早报提供）</p>
-                <p>● <strong className="text-slate-900">配置：</strong> 6 人同行、攜 4 件大旅行行李箱，附設 1 - 3 歲幼兒合規防護安全座椅一組。</p>
+                <p>● <strong className="text-slate-900">隨行配置：</strong> 6 人同行、攜 4 件大行李箱，附設合規安全座椅一組。</p>
               </div>
             </div>
 
             {/* BUTLER ARRIVAL AND CHECKOUT PRIORITY PROCEDURES */}
-            <div className="p-4 rounded-3xl bg-amber-50/60 border border-amber-200 text-xs leading-relaxed text-slate-700 font-semibold font-sans shadow-sm">
+            <div className="p-4 rounded-3xl bg-white border border-amber-300 text-xs sm:text-sm leading-relaxed text-slate-800 font-semibold font-sans shadow-md">
               <div className="flex gap-2 items-center text-amber-800 font-black mb-2">
-                <ShieldCheck className="w-5 h-5 text-amber-700" />
-                <span className="text-xs font-black">Yacht Club 優先下船特權（6/30 基隆碼頭）</span>
+                <ShieldCheck className="w-5 h-5 text-amber-600" />
+                <span className="text-sm font-black">Yacht Club 優先下船禮遇（6/30 基隆碼頭）</span>
               </div>
               <p className="text-slate-700 font-medium text-justify">
-                <strong>離船前夕，免除一切焦急打包搬箱痛苦：</strong><br />
-                在 6/29 靠岸前夕，專屬 YC 管家會為您送到房間金色專用優先下船吊牌與行李牌。您只需在離船當日凌晨 01:00 以前，將托運行李拴妥吊牌放在大門口走道上即可。行李將在夜間由 VIP 電梯和託用專線提前平地運卸下。<br />
-                <strong>離船登陸免排特惠通道：</strong><br />
-                上午 09:00 前，家長與家人可在 16 樓 YC Top Sail 酒廊享用慢速精細早點，喝完柳丁汁。隨後依約定在 16F 禮賓部集合，由各層專屬管家與禮賓親自列隊在最前排護航直接通往海關！海關口為 MSC 貴賓設有「YC 專用黃金通道」，免去幾千名普通艙遊客在 Deck 6 百米大道等候的焦灼！
+                <strong>輕鬆體驗離船日，告別繁瑣打包流程：</strong><br />
+                在 6/29 靠港前夕，專屬 YC 管家會將金色專用優先下船吊牌與行李牌送至您的套房。您只需在離船當日凌晨 01:00 前，將拴好吊牌的托運行李置於房門外走道即可。行李將透過 VIP 專用通道提早運送下船。<br />
+                <strong>專屬快速通關，悠閒抵港：</strong><br />
+                離船日上午 09:00 前，同行貴賓可於 16 樓 YC Top Sail 景觀酒廊享用精緻早餐。隨後於 16 樓禮賓部集合，管家與禮賓團隊將親自全程護送您前往海關。海關現場特別設有「YC 專用黃金通道」，讓您快捷避開擁擠排隊，輕鬆通關！
               </p>
             </div>
           </div>
